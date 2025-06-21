@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Nintendo Burg</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="bg-gray-800 text-white w-64 flex-shrink-0">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-xl font-bold">Nintendo Burg</h1>
+                <p class="text-gray-400 text-sm">Painel Administrativo</p>
+            </div>
+            
+            <nav class="p-4">
+                <a href="{{ url_for('admin_dashboard') }}" class="block py-2 px-4 rounded hover:bg-gray-700 {% if request.endpoint == 'admin_dashboard' %}bg-gray-700{% endif %}">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </a>
+                <a href="{{ url_for('admin_products') }}" class="block py-2 px-4 rounded hover:bg-gray-700 {% if request.endpoint == 'admin_products' %}bg-gray-700{% endif %}">
+                    <i class="fas fa-box-open mr-2"></i> Produtos
+                </a>
+                <a href="{{ url_for('admin_orders') }}" class="block py-2 px-4 rounded hover:bg-gray-700 {% if request.endpoint == 'admin_orders' %}bg-gray-700{% endif %}">
+                    <i class="fas fa-shopping-cart mr-2"></i> Pedidos
+                </a>
+                <a href="{{ url_for('admin_inventory') }}" class="block py-2 px-4 rounded hover:bg-gray-700 {% if request.endpoint == 'admin_inventory' %}bg-gray-700{% endif %}">
+                    <i class="fas fa-warehouse mr-2"></i> Estoque
+                </a>
+                <a href="{{ url_for('admin_logout') }}" class="block py-2 px-4 rounded hover:bg-gray-700 mt-4">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                </a>
+            </nav>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">
+                        {% block header %}{% endblock %}
+                    </h2>
+                    <div class="text-gray-600">
+                        <i class="fas fa-user-circle mr-2"></i> {{ session.get('admin_username') }}
+                    </div>
+                </div>
+            </header>
+            
+            <main class="p-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="mb-4 p-3 rounded {% if category == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+</body>
+</html>

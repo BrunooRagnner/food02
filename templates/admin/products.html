@@ -1,0 +1,121 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Gerenciar Produtos</h1>
+    <button onclick="document.getElementById('addProductModal').classList.remove('hidden')" 
+            class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+        Adicionar Produto
+    </button>
+</div>
+
+<!-- Modal de Adicionar Produto -->
+<div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-bold mb-4">Adicionar Novo Produto</h2>
+        
+        <form method="POST" action="{{ url_for('admin_products') }}" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Categoria</label>
+                <select name="category" class="w-full p-2 border rounded" required>
+                    <option value="hamburgueres">Hambúrgueres</option>
+                    <option value="bebidas">Bebidas</option>
+                    <option value="sobremesas">Sobremesas</option>
+                    <option value="pizzas">Pizzas</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Nome</label>
+                <input type="text" name="name" class="w-full p-2 border rounded" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Preço</label>
+                <input type="number" step="0.01" name="price" class="w-full p-2 border rounded" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Descrição</label>
+                <textarea name="description" class="w-full p-2 border rounded"></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Estoque</label>
+                <input type="number" name="stock" class="w-full p-2 border rounded" value="0">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Imagem</label>
+                <input type="file" name="image" class="w-full p-2 border rounded" accept="image/*">
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="button" onclick="document.getElementById('addProductModal').classList.add('hidden')" 
+                        class="mr-2 px-4 py-2 border rounded hover:bg-gray-100">
+                    Cancelar
+                </button>
+                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Produtos por Categoria -->
+{% for category, items in products.items() %}
+<div class="mb-8">
+    <h2 class="text-xl font-bold mb-4">{{ category|capitalize }}</h2>
+    
+    {% if items %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg overflow-hidden">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="text-left py-3 px-4">Imagem</th>
+                    <th class="text-left py-3 px-4">Nome</th>
+                    <th class="text-left py-3 px-4">Preço</th>
+                    <th class="text-left py-3 px-4">Estoque</th>
+                    <th class="text-left py-3 px-4">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in items %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}" class="w-16 h-16 object-cover rounded">
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-medium">{{ product.name }}</div>
+                        <div class="text-gray-500 text-sm">{{ product.description }}</div>
+                    </td>
+                    <td class="py-3 px-4">R$ {{ "%.2f"|format(product.price) }}</td>
+                    <td class="py-3 px-4">{{ product.stock }}</td>
+                    <td class="py-3 px-4">
+                        <a href="{{ url_for('delete_product', category=category, product_id=product.id) }}" 
+                           class="text-red-500 hover:text-red-700" 
+                           onclick="return confirm('Tem certeza que deseja excluir este produto?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500">Nenhum produto nesta categoria</p>
+    {% endif %}
+</div>
+{% endfor %}
+
+<script>
+    // Fechar modal ao clicar fora
+    document.getElementById('addProductModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}
